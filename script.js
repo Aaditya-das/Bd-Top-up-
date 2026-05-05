@@ -359,4 +359,4 @@ function showToast(msg, type='', duration=3000) {
     t.className = 'toast ' + type + ' show';
     clearTimeout(t._timeout);
     t._timeout = setTimeout(() => t.classList.remove('show'), duration);
-}
+            }
