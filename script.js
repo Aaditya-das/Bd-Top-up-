@@ -162,9 +162,12 @@ window.togglePasswordVisibility = function(inputId, toggleId) {
     else { input.type = 'password'; toggle.textContent = '👁️'; }
 };
 
-// ====== EMAIL VALIDATION (Gmail only) ======
-function isValidGmail(email) {
+// ====== EMAIL VALIDATION (Gmail only, except admin) ======
+function isAllowedEmail(email) {
     email = email.trim().toLowerCase();
+    // Admin account is always allowed, regardless of domain
+    if (email === 'admin@aadityatopup.com') return true;
+    // Regular customers must use @gmail.com
     return email.endsWith('@gmail.com') && email.length > '@gmail.com'.length;
 }
 
@@ -176,7 +179,7 @@ window.handleSignUp = function() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
     if (!email || !password) return showToast('Enter email and password', 'error');
-    if (!isValidGmail(email)) return showToast('❌ Only @gmail.com addresses allowed', 'error');
+    if (!isAllowedEmail(email)) return showToast('❌ Only @gmail.com addresses allowed (or admin account)', 'error');
     if (password.length < 6) return showToast('Password min 6 chars', 'error');
     const users = getUsers();
     if (users[email.toLowerCase()]) return showToast('Email already registered', 'error');
@@ -190,7 +193,7 @@ window.handleSignIn = function() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
     if (!email || !password) return showToast('Enter email and password', 'error');
-    if (!isValidGmail(email)) return showToast('❌ Only @gmail.com addresses allowed', 'error');
+    if (!isAllowedEmail(email)) return showToast('❌ Only @gmail.com addresses allowed (or admin account)', 'error');
     const users = getUsers();
     const user = users[email.toLowerCase()];
     if (!user) return showToast('No account found', 'error');
@@ -393,12 +396,13 @@ function updateOrderStatus(index, status) {
 }
 window.deleteOrder = function(index) {
     if (!confirm('Delete?')) return;
-    const orders = JSON.parse(localStorage.getItem('aaditya_orders') || '[]');
+const orders = JSON.parse(localStorage.getItem('aaditya_orders') || '[]');
     orders.splice(index, 1);
     localStorage.setItem('aaditya_orders', JSON.stringify(orders));
     loadAllOrders();
     showToast('Deleted', 'success');
 };
+
 window.refreshAdminOrders = function() { loadAllOrders(); showToast('🔄 Refreshed'); };
 
 function showToast(msg, type='', duration=3000) {
@@ -407,4 +411,4 @@ function showToast(msg, type='', duration=3000) {
     t.className = 'toast ' + type + ' show';
     clearTimeout(t._timeout);
     t._timeout = setTimeout(() => t.classList.remove('show'), duration);
-}
+                   }
